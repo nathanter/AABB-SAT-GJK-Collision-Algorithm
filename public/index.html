@@ -1,6 +1,9 @@
 <html>
 
 <head>
+    <meta charset="UTF-8" />
+    <title>Collision stuff</title>
+    <link rel="stylesheet" href="./style.css">
 
 
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -9,12 +12,15 @@
 
 <body>  
     <H1> Algorithms</H1>
-    <p>a piece of math that I think is extremely underappreciated is the math behind collision algorithms.
+    <p>
+    if I throw a ball at a wall, we know the collision makes the ball bounce back. But these collisions don't just occur in real life, they also occur in computer simulations.
+    but we can't just tell the computer, if I walk into a wall make me bounce back, so how do collisions actually work?
+    the math behind simulating physics collisions in computer graphics is very interesting and nifty piece of math that I think is extremely underappreciated
     In the places where these algorithms are used the most(being computer graphics and game engines) many tools just automatically handle the physics logic and the user is uninformed 
     about the underlying math.
     
     <hr>
-    but as more and more people start learning about the math for the sake of self made graphics or game engines, it's important to have a simple start off to research of a complex topic.
+    but as more and more people start learning about the math for the sake of self made graphics or game engines, it's important to have a simple start off to research of this complex topic.
 
 
     the goal of the article is to provide is a collection of common algorithms used to simulate the physics of two objects colliding accompanied by images from self built simulation as well as 
@@ -26,8 +32,14 @@
 
     <h2> AABB(Axis Alligned Bounding Box)</h2>
     
-    <p> this algorithm is the most simple but also has applications to larger scale systems in collision optimization in the form of AABB trees
+    <p> this algorithm is the most simple but also has applications to larger scale systems in collision optimization in the form of AABB trees(talked on later)
+        first what is an AABB?
 
+        <hr>
+        <p class="image">
+            <img src="./assets/AABBOVERLAP.png"></img>
+            <div class="subtitle">an AABB</div> 
+        </p>
         the algorithm just states that if two non rotated rectangles have an overlap on the x and y Axis then those two boxes are colliding and the collision needs to be resolved.
 
         logically this makes sense  
