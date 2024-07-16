@@ -120,7 +120,7 @@ def aabb(s, shapes,movement,viewsupports,active):
 
     
     
-    pygame.draw.rect(s,(255,0,0),shapes[0])
+    #pygame.draw.rect(s,(255,0,0),shapes[0])
     pygame.draw.rect(s,(0,0,255),shapes[1])
     if viewsupports == True:
         
