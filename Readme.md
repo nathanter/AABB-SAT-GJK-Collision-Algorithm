@@ -1,8 +1,8 @@
 # Everything about collisions
 
-educational simulation and collection of all well known and important collision algorithms including the AABB, SAT, GJK, Pixel Perfect, Particle.
+educational phyiscs engine made as a simulation and collection of well known and important collision algorithms including the AABB, SAT, GJK, Pixel Perfect, Particle.
 
-I hope to provide a reference and resource for those learning or developing programs using these algorthms or wanting to understand the underlyingmath
+I hope to provide a reference and resource for those learning or developing programs using these algorthms or wanting to understand the underlying math
 
 
 ## Article
