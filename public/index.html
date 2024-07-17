@@ -14,8 +14,8 @@
 
     <H1> Algorithms</H1>
     <p>
-    if I throw a ball at a wall, we know the collision makes the ball bounce back. But these collisions don't just occur in real life, they also occur in computer simulations.
-    but we can't just tell the computer, if I walk into a wall make me bounce back, so how do collisions actually work?
+    if I throw a ball at a wall, we know a collision with the wall makes the ball bounce back. these collisions don't just occur in real life, they also occur in computer simulations.
+    but we can't just tell the computer, if I walk into a wall, make me bounce back, so how do collisions actually work?
     </p>
     <hr>
     <p>
@@ -45,16 +45,61 @@
             <img src="./assets/coolbox.png"></img>
             <div class="subtitle">an AABB</div> 
         </p>
-        the algorithm just states that if two non rotated rectangles have an overlap on the x and y Axis then those two boxes are colliding and the collision needs to be resolved.
-
-        logically this makes sense  
+        <div>
+        <p>
+            An AABB or Axis Alligned Bounding Box refers to objects which are alligned along the same axis and are rectanges defined by two points, the bottom left and top right.
+            <p>
+            the bottom right and top right gives us the mininum and maximum of the x and the y and filling out the area in between gives us our box or rectangle.
+            </p>
+            <div>
+            furthermore, this means that boxes that are rotated differently to each other do not adhere to the AABB algorithm.
+            </div>
+        </p>
+       
+        <p>
+        the algorithm itself just states that if two of these boxes have an overlap on the x and y Axis then those two boxes are colliding and the collision needs to be resolved.
+        </p>
+        <p>
+        logically this makes sense. as an overlap on both these axis means a total overlap as seen below. 
+        </p>
+            
+        </div>
         <p class="image">
             <img src="./assets/AABBOVERLAP.png"></img>
             <div class="subtitle">example of two axis alligned bounding boxes colliding</div> 
         </p>
+
+        <p>
+            mathmatically this means that if
+            <div class="equation">$$\int_{-\infty}^{\infty} | \,dx = 1$$</div>
+
+        </p>
     </p>
 
     <h2> SAT(seperating Axis Theorem)</h2>
+    <p>
+        The seperating axis theorem takes a bit more understanding of more advanced mathmatics but can also be applied to non rectangular shapes.
+    </p>
+
+    <p>
+        The first thing to understand is the dot product, a mathmatical process that produces the the measure by how close two vectors are alligned. For the sake of these algorithms, the dot product represents a projection of one vector onto another.
+
+    </p>
+    <p class="image">
+        <img src="./assets/MathinsightSC.png"></img>
+        <div class="subtitle">visualization of projection taken from math Insight</div> 
+    </p>
+    <p>
+        as we can see above, the dot product represents the closest point on one line to the tip of another line. 
+    </p>
+    <p>
+        another way to understand it is the shadow of a line onto another if a light was shone onto it.
+
+    </p>
+    <p>
+        mathmatically, you acheive the dot product through
+        
+    </p>
     <h2> GJK  </h2>
     <h2> Collisions in particle systems</h2>
 

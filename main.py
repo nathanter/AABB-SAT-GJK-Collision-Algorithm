@@ -112,27 +112,28 @@ def aabbcol(rect1,rect2):
     return [rect1,rect2]
 
 
-def aabb(s, shapes,movement,viewsupports,active):
+def aabb(s, shapes,movement,viewsupports,active,colors):
     pygame.Surface.fill(s,OVERALL_WHITE)
     shapes[active].x += movement[0]/60
     shapes[active].y += movement[1]/60
    
 
-    
-    
-    #pygame.draw.rect(s,(255,0,0),shapes[0])
-    pygame.draw.rect(s,(0,0,255),shapes[1])
     if viewsupports == True:
         
         projection = pygame.Surface((200,200),pygame.SRCALPHA)
         rect = pygame.Rect(0,0,shapes[0].w,shapes[0].h)
         pygame.draw.rect(projection,(255,0,0,128),rect)
         s.blit(projection,(shapes[0].x + movement[0] ,shapes[0].y+movement[1]))
-    returnv = aabbcol(shapes[0],shapes[1])
-    shapes[0] = returnv[0]
-    shapes[1] = returnv[1]
+    for x in range(len(shapes)):
+        for y in range(x, len(shapes)):
+            pygame.draw.rect(s,colors[x],shapes[x])
+        
+    
+            returnv = aabbcol(shapes[x],shapes[y])
+            shapes[x] = returnv[0]
+            shapes[y] = returnv[1]
 
-    return [s,[shapes[0],shapes[1]]]
+    return [s,[shapes]]
 
 
 def dot_product(shape,normal): 
@@ -197,33 +198,65 @@ def sat(s,triangles,mp,viewsupports,active):
     for tri in triangles:
              
         tri.render_shape(s,(255,0,0)) 
-        print(tri.normals)
+ 
         if viewsupports == True:
                 tri.rendercol(s)
     
     return s
+
+
+
+def passed_zero(direction,point):
+    if dot_product(point,direction) < 0:
+        return False
+    else: return True
 def support_gjk(shape1,normal):
-    min  = -1
-    stored_vertix  =[0,0]
+   
+    stored_vertix  =[]
     for vertix in shape1.vertices:
         dot = dot_product(vertix,normal)
-        
-        if dot >= min:
-            min == dot
-            stored_vertix = vertix
+        stored_vertix.append(dot)
+    
 
-    return stored_vertix
+    return max(stored_vertix)
 
-def passorigincheck(direction,point,start):
-    pass
 def checkgjk(shape1, shape2 ):
-
     direction = [1,0]
-    farpoint = dot_product(shape1,direction)
-    oppdirection = [x*-1 for x in direction]
-    oppfarpoint = dot_product(shape2,oppdirection)
-    new_point = farpoint-oppfarpoint
-    simplex_points = [new_point]
+    simplex_points = []
+    for i in range(2):
+        
+        farpoint = support_gjk(shape1,direction)
+        oppdirection = [x*-1 for x in direction]
+        oppfarpoint = support_gjk(shape2,oppdirection)
+        new_point = [farpoint[i] - oppfarpoint[i] for i in range(len(farpoint))]
+        simplex_points.append(new_point)
+    
+        if new_point == [0,0]:
+            return True
+        if i == 1:
+            if passed_zero(new_point,direction) == False:
+                return False
+    
+        direction = [k * -1 for k in new_point]
+
+        while True:
+            gjktriangle()
+#more logic
+
+def gjktriangle(simplex_points,shape1,shape2):
+    normal = max(simplex_points[0][0],simplex_points[1][0])/max(simplex_points[0][1],simplex_points[1][1])
+    
+
+
+    
+    
+    
+    
+    
+
+
+
+        
 
 def gfx(s,shapes,amp):
 
@@ -252,26 +285,28 @@ def aabb_init():
     return [rect1,rect2]
 
 def particle_system_init():
-    shape1 = shapemodule.particle([400,300],10,[-40,30],[255,0,0])
-    shape2 = shapemodule.particle([400,400],10,[40,30],[255,0,0])
+    shape1 = shapemodule.particle([400,300],10,[0,20],[255,0,0])
+    shape2 = shapemodule.particle([400,400],10,[0,20],[255,0,0])
     shape3 = shapemodule.particle([500,300],10,[-50,20],[255,0,0])
-    shape4 = shapemodule.particle([600,400],10,[50,40],[255,0,0])
+    #shape4 = shapemodule.particle([600,400],10,[50,40],[255,0,0])
 
-    return[shape1,shape2,shape3,shape4]
+    return[shape1,shape2,shape3]
 
 
 def partcol(shapes1p,shapes2p):
 
     
-    if ((shapes1p.coords[0] - shapes2p.coords[0])**2 + (shapes1p.coords[1] - shapes2p.coords[1]) ** 2 < (shapes1p.radius+ shapes2p.radius) **2):
+    if ((shapes1p.coords[0] - shapes2p.coords[0])**2 + (shapes1p.coords[1] - shapes2p.coords[1])** 2 < (shapes1p.radius+ shapes2p.radius) **2):
+               
                 return True
+                
     
     else: return False
 
   
 def pruning(shapes):
     shapes = sorting.sort(shapes)
- 
+    
     temp = [shapes[0]]
     active = []
     
@@ -279,36 +314,43 @@ def pruning(shapes):
         
       
         
-        if shapes[x].coords[0] - shapes[x].radius <= temp[-1].coords[0] + temp[-1].radius:
+        if (shapes[x].coords[0] - shapes[x].radius <= temp[-1].coords[0] + temp[-1].radius):
                 
                 temp.append(shapes[x])
                
                
 
         else:
-            active.append(temp)
+            if(len(temp) > 1):
+                active.append(temp)
             temp = [shapes[x]]
             
-    active.append(temp)
+    if(len(temp) > 1):
+                active.append(temp)
 
-    return shapes,active
+    return active
 
 
 def particles(s,shapes):
     pygame.Surface.fill(s,OVERALL_WHITE)
 
-    shapes, indextracker = pruning(shapes)
+    indextracker = pruning(shapes)
     
- 
 
     for x in indextracker:
-        for y in range(len(x)-1):
-            if partcol(x[y],x[y+ 1]) == True:
-                x[y].physics[0] *= -1
-                x[y].physics[1] *= -1
-                x[y+1].physics[0] *= -1
-                x[y+1].physics[1] *= -1
-            
+        for y in range(len(x)):
+            for z in range(y,len(x)):
+           
+                if partcol(x[y],x[z]) == True:
+                
+                    x[y].physics[0] *= -1
+                    x[y].physics[1] *= -1
+                    x[z].physics[0] *= -1
+                    x[z].physics[1] *= -1
+                    
+                
+
+
                 
         
     for shape in shapes:
@@ -380,8 +422,11 @@ def main_loop():
                     else: viewsupports = True
                 if but == 6:
                     if state == 4:
-                        temp = shapemodule.particle([600,400],10,[random.randint(-1,1)*50,40],[255,0,0])
+                        temp = shapemodule.particle([random.randint(1,7)*100,400],10,[random.randint(-1,1)*20,40],[random.randint(0,255),random.randint(0,255),random.randint(0,255)])
                         shapes.append(temp)
+
+                    if state == 0:
+                        temp = pygame.Rect([])
 
           
 
@@ -443,7 +488,7 @@ def main_loop():
             s = ar[0]
 
         clock.tick()
-      
+       
         but = buttons.button_logic(ui_space,pygame.mouse.get_pos(),240)
         screen.blit(ui_space,(0,0))
         screen.blit(s,(ui_width,0))
