@@ -49,7 +49,7 @@
         <p>
             An AABB or Axis Alligned Bounding Box refers to objects which are alligned along the same axis and are rectanges defined by two points, the bottom left and top right.
             <p>
-            the bottom right and top right gives us the mininum and maximum of the x and the y and filling out the area in between gives us our box or rectangle.
+            the bottom right and top right gives us the mininum and maximum of the x and the y and filling out the area in between gives us our box or rectangle.(as shown above)
             </p>
             <div>
             furthermore, this means that boxes that are rotated differently to each other do not adhere to the AABB algorithm.
@@ -57,7 +57,7 @@
         </p>
        
         <p>
-        the algorithm itself just states that if two of these boxes have an overlap on the x and y Axis then those two boxes are colliding and the collision needs to be resolved.
+        the AABB collision algorithm itself just states that if two of these boxes have an overlap on the x and y Axis then those two boxes are colliding and the collision needs to be resolved.
         </p>
         <p>
         logically this makes sense. as an overlap on both these axis means a total overlap as seen below. 
@@ -70,8 +70,13 @@
         </p>
 
         <p>
-            mathmatically this means that if
-            <div class="equation">$$\int_{-\infty}^{\infty} | \,dx = 1$$</div>
+            <p>
+            mathmatically the overlap of two boxes can be determined if the mininum or maximum value of a box on the x or y axis is within the range defined by the min and max of the other on the same axis. 
+            </p>
+            <p>
+                in the example of the mininum x value of a box, we know that there is an overlap if:
+            </p>
+            <div class="equation">$$\text{minx}_\text{rectangle 1} >= \text{minx}_\text{rectange 2} \text{and} \text{minx}_\text{rectangle 1} <= \text{max x}_\text{rectangle 2} $$</div> 
 
         </p>
     </p>
