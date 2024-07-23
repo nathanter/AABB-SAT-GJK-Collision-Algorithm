@@ -116,6 +116,10 @@ class triangle():
 
 
 
+
+
+
+#polygon ass
 class Polygon:
     def __init__(self,first_point,side_length):
 

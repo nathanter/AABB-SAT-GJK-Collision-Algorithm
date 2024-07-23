@@ -7,7 +7,7 @@ import shapemodule
 import sorting
 
 
-OVERALL_WHITE = (240,235,235)
+OVERALL_WHITE = (255,255,255)
 class ui():
     
     def __init__(self,functions) -> None:
@@ -32,7 +32,7 @@ class ui():
 
         sidebar = pygame.Rect(0,0,width,screen.get_size()[1])
         
-        pygame.draw.rect(screen,(100,100,50),sidebar)
+        pygame.draw.rect(screen,(240,235,235),sidebar)
         f  = pygame.font.Font(None,14)
         for x in range(len(rects)) :
             if x != hover:
@@ -75,6 +75,13 @@ def get_edges(vertices):
     return [(vertices[i], vertices[(i + 1) % len(vertices)]) for i in range(len(vertices))]
     
 
+def calc_onen(point1,point2):
+    dx = point1[0] - point2[0]
+    dy = point1[1] - point2[1]
+    slop = -dx/dy if dy != 0 else float('inf')
+    return slop
+
+
 def calculate_normals(triangles):
     normals = []
     for tri in triangles:
@@ -114,28 +121,34 @@ def aabbcol(rect1,rect2):
 
 def aabb(s, shapes,movement,viewsupports,active,colors):
     pygame.Surface.fill(s,OVERALL_WHITE)
+
     shapes[active].x += movement[0]/60
     shapes[active].y += movement[1]/60
    
-
+    
     if viewsupports == True:
         
         projection = pygame.Surface((200,200),pygame.SRCALPHA)
         rect = pygame.Rect(0,0,shapes[0].w,shapes[0].h)
         pygame.draw.rect(projection,(255,0,0,128),rect)
         s.blit(projection,(shapes[0].x + movement[0] ,shapes[0].y+movement[1]))
-    for x in range(len(shapes)):
-        for y in range(x, len(shapes)):
-            pygame.draw.rect(s,colors[x],shapes[x])
-        
+
+
     
+    for x in range(len(shapes)):
+        pygame.draw.rect(s,colors[x],shapes[x])
+        for y in range(x + 1, len(shapes)):
             returnv = aabbcol(shapes[x],shapes[y])
             shapes[x] = returnv[0]
             shapes[y] = returnv[1]
 
-    return [s,[shapes]]
+    return [s,shapes]
 
-
+def full_dot(vector1,vector2):
+    dots = vector1[0] * vector2[0] + vector1[1]*vector2[1]
+    return dots
+            
+        
 def dot_product(shape,normal): 
     
     dots = [i[0] * 1 + i[1] * normal for i in shape.vertices]  
@@ -205,47 +218,117 @@ def sat(s,triangles,mp,viewsupports,active):
     return s
 
 
+def find_n_triple(vector1,vector2,vector3):
+    perp_len = vector1[0] * vector2[1] - vector1[1]* vector2[0]    
+    return[-perp_len*vector3[1],perp_len*vector3[0]] 
 
 def passed_zero(direction,point):
-    if dot_product(point,direction) < 0:
+    if full_dot(point,direction) < 0:
         return False
     else: return True
+
 def support_gjk(shape1,normal):
    
-    stored_vertix  =[]
+    stored_vertix = shape1.vertices[0]
+    min = full_dot(shape1.vertices[0],normal)
     for vertix in shape1.vertices:
-        dot = dot_product(vertix,normal)
-        stored_vertix.append(dot)
+        dot = full_dot(vertix,normal)
+        if dot > min:
+            stored_vertix = vertix
+            min = dot
+
     
 
-    return max(stored_vertix)
+    return stored_vertix
 
 def checkgjk(shape1, shape2 ):
     direction = [1,0]
     simplex_points = []
-    for i in range(2):
+    for l in range(2):
         
         farpoint = support_gjk(shape1,direction)
         oppdirection = [x*-1 for x in direction]
         oppfarpoint = support_gjk(shape2,oppdirection)
         new_point = [farpoint[i] - oppfarpoint[i] for i in range(len(farpoint))]
-        simplex_points.append(new_point)
     
+        simplex_points.append(new_point)
+        
         if new_point == [0,0]:
             return True
-        if i == 1:
-            if passed_zero(new_point,direction) == False:
+     
+        if passed_zero(new_point,direction) == False:
+                
                 return False
+
     
         direction = [k * -1 for k in new_point]
 
-        while True:
-            gjktriangle()
+    while True:
+        
+        resultOfCol = trianglecase(simplex_points,shape1,shape2)
+        if resultOfCol[0] == True:
+            
+            return True
+            
+        else:
+            if resultOfCol[1] == -1:
+               return False
+            else: simplex_points = resultOfCol[1]
+
+           
+
+
+def trianglecase(simplex,shape1,shape2):
+    ab = [simplex[0][0] - simplex[1][0],simplex[0][1] - simplex[1][1]]
+    ao = [-1 * i for i in simplex[1]]
+
+    new_normal = find_n_triple(ab,ao,ab)
+    point = support_gjk(shape1,new_normal)
+    oppnewnormal = [i*-1 for i in new_normal]
+    opp_point = support_gjk(shape2,oppnewnormal)
+    new_point  = [point[0] - opp_point[0],point[1] - opp_point[1]]
+    simplex.append(new_point)
+
+    if passed_zero(new_point,new_normal) == False :
+        return [False,-1]
+    
+    if simplex[0] == simplex[2] or simplex[1] == simplex[2]:
+        return [False,-1]
+    ab =[simplex[1][0] - simplex[2][0],simplex[1][1] - simplex[2][1]]
+    ac =[simplex[0][0] - simplex[2][0],simplex[0][1] - simplex[2][1]]
+
+    ab_perp = find_n_triple(ac,ab,ab)
+    ac_perp = find_n_triple(ab,ac,ac)
+    ao = [i * -1 for i in simplex[2]]
+    if(full_dot(ab_perp,ao) > 0):
+        return [False,[simplex[1],simplex[2]]]
+    
+    elif(full_dot(ac_perp,ao) > 0):
+        return [False, [simplex[0],simplex[2]]]
+    
+    else: return [True,0]
+
+
+    
+
+
+
+
+    #using this find the normal
+    #support to find support point
+    #check whether it crosses and contains zero#
+    #if support point already in simplex kill program
+    #contain zero:
+    #take normals relative to final point -> 0 vector
+    #if both are < zero return true
+    #else take best one and remove corresponding point from simplex
+      
 #more logic
 
-def gjktriangle(simplex_points,shape1,shape2):
-    normal = max(simplex_points[0][0],simplex_points[1][0])/max(simplex_points[0][1],simplex_points[1][1])
+
     
+
+
 
 
     
@@ -262,15 +345,20 @@ def gfx(s,shapes,amp):
 
     pygame.Surface.fill(s,OVERALL_WHITE)
     shapes[0].update(amp)
+    if(checkgjk(shapes[0],shapes[1])):
+       amp = [k*-1 for k in amp]
+       shapes[0].update(amp)
 
+   
     for x in shapes:
         
         s = x.render(s)
 
+
     return s
 def gfx__init():
     shapes1 = shapemodule.Polygon([200,200],50)
-    shapes2 = shapemodule.Polygon([0,0],50)
+    shapes2 = shapemodule.Polygon([500,500],50)
     return [shapes1,shapes2]
 
 def sat_init():
@@ -376,11 +464,13 @@ screen = pygame.display.set_mode()
 ui_width = 150
 ui_space = pygame.Surface((ui_width,screen.get_size()[1]))
 s = pygame.Surface((screen.get_size()[0]-ui_width, screen.get_size()[1]))
+
 def main_loop():
     shapes = aabb_init()
     s = pygame.Surface((screen.get_size()[0]-ui_width, screen.get_size()[1]))
     state = 0
     clock = pygame.Clock()
+    color_list = [(255,0,0),(0,255,0)]
     but = -1
     buttons = ui(["AABB","SAT","GJK","Masks","Particles","View Supports","Add Shape"])
     but = buttons.button_logic(s,pygame.mouse.get_pos(),240)
@@ -426,9 +516,10 @@ def main_loop():
                         shapes.append(temp)
 
                     if state == 0:
-                        temp = pygame.Rect([])
+                        temp = pygame.Rect(random.randint(0,s.size[0]),random.randint(0,s.size[1]),200,100)
 
-          
+                        shapes.append(temp)
+                        color_list.append((0,0,255))
 
                
 
@@ -465,10 +556,11 @@ def main_loop():
         amp = [mp[0]*50 + mp[1] * 50,mp[2]*50 + mp[3] * 50]
     
         if state == 0:
-            hel = aabb(s,shapes,amp,viewsupports,active)
+            hel = aabb(s,shapes,amp,viewsupports,active,color_list)
             s =hel[0]
             shapes = hel[1]
        
+
                
 
         elif state == 1:
