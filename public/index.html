@@ -19,16 +19,16 @@
     </p>
     <hr>
     <p>
-        The math behind simulating physics collisions in computer graphics is a very interesting piece of math that I think is extremely underappreciated. 
+        The math behind simulating physics collisions in computer graphics is a very interesting piece of math that is underappreciated. 
         many tools that use these concepts(being computer graphics and game engines)just automatically handle the physics logic and the user is uninformed 
         about the underlying math.
 
     </p>
     <p>
-        As more and more people start learning about the math for the sake of self made graphics or game engines, I want to try and help others in their research by providing a simple start off point.
+        As more and more people start learning about the math for the sake of self made projects, More resources to learn are needed.
     </p>
     <p>
-        The goal of the article is to provide is a collection of common algorithms used to simulate the physics of two objects colliding accompanied by images from self built simulation as well as 
+        The goal of the article is to provide is a collection of common algorithms and a concept used to simulate the physics of two objects colliding accompanied by images from self built simulation as well as 
         mathmatical explanation for how they work. Hopefully, this helps some people understand what algorithms are available before they go into the more in depth topics of optimization
         which are also mentioned below along with sources i've found on the topic that are hopefully good.
         
@@ -37,7 +37,7 @@
 
     <h2> AABB(Axis Alligned Bounding Box)</h2>
     
-    <p> This algorithm is the most simple but also has applications to larger scale systems in collision optimization in the form of AABB trees(talked on later)</p>
+    <p> This algorithm is the most simple but also has applications to larger scale systems in collision optimization in the form of AABB trees</p>
         <p>
         First, what is an AABB?
 
@@ -75,23 +75,28 @@
             Mathmatically the overlap of two boxes can be determined if the mininum or maximum value of a box on the x or y axis is within the range defined by the min and max of the other on the same axis. 
             </p>
             <p>
-                So if:
+                In the example of the x axis, if:
             </p>
             <div class="equation">$$\text{min x}_\text{rectangle 1} >= \text{min x}_\text{rectange 2} \text{and} \text{ minx}_\text{rectangle 1} <= \text{max x}_\text{rectangle 2} $$</div> 
             <p>
                 or
             </p>
             <div class="equation">$$\text{max x}_\text{rectangle 1} >= \text{min x}_\text{rectange 2} \text{and} \text{ max x}_\text{rectangle 1} <= \text{max x}_\text{rectangle 2} $$</div> 
+
+            if these conditions are true then there is a collision that needs to be resolved
         </p>
     </p>
 
     <h2> SAT(seperating Axis Theorem)</h2>
     <p>
         The seperating axis theorem takes a bit more understanding of more advanced mathmatics but can also be applied to non rectangular shapes.
+    
     </p>
-
     <p>
-        The first thing to understand is the dot product, a mathmatical process that produces the the measure by how close two vectors are alligned. For the sake of these algorithms, the dot product represents a projection of one vector onto another.
+        Further theorems require knowledge of vectors, so before we continue: vectors are just containers with 2 values,in this case, the x coordinate and y coordinate.
+    </p>
+    <p>
+        The first thing to understand is a vector concept of the dot product, a mathmatical process that produces the the measure by how close two vectors are alligned. For the sake of these algorithms, the dot product represents a projection of one vector onto another.
 
     </p>
     <p class="image">
@@ -106,31 +111,36 @@
 
     </p>
     <p>
-        Mathmatically, if you assume
+        
+        mathamtically, you can derive the equation of the dot product between two vectors as 
+        <div class="equation">$$\x_vector1 * x_vector2 + y_vector1 * y_vector2 $$</div> 
+
         
     </p>
-    <h2> GJK  </h2>
-    <h2> Collisions in particle systems</h2>
+
+    <hr>
+
+    <p>
+        The Seperating Axis Theorem states that if a straight line can be drawn in between two shapes without intersecting both of the shapes,then those shapes are not colliding.
 
 
 
+    </p>
+    <p>
+        Seems obvious right? but if you think about how to compute the answer to the question it gets a bit more complicated. Do we draw every line to determine if such a line exists?  
 
-    <H1> Collision Resolution</H1>
+    </p>
 
-
-
-
-
-
-    <H1> Optimizations for large scale situations</H1>
-
-
-
-
-
-    <h3> sources</h3>
-
-
+    <p>
+        No, that would take way too long to compute, so instead, we compute based on the lines perpendicular to each side of a triangle.
+    </p>
+    <p>
+        this nets 6 lines(one perpendicular for each side of the 2 triangles), then to determine if they exist between the two objects we have the use the dot product.
+    </p>
+    <p> by taking the dot product of each point relative to the one of the 6 lines, we can take the max and min values to get a "shadow" of a shape on the line. This reprents the range of space on the line the shape takes up.
+    
+    </p>
+    <p> the final part of the algorithm states that if these two ranges intersect for all 6 lines, then these two shapes are colliding and intersect each other</p>
 
     </body>     
     </html>

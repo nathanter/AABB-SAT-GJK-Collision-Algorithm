@@ -472,7 +472,7 @@ def main_loop():
     clock = pygame.Clock()
     color_list = [(255,0,0),(0,255,0)]
     but = -1
-    buttons = ui(["AABB","SAT","GJK","Masks","Particles","View Supports","Add Shape"])
+    buttons = ui(["AABB","SAT","GJK","Particles","View Supports","Add Shape"])
     but = buttons.button_logic(s,pygame.mouse.get_pos(),240)
     mp = [0,0,0,0]
     active = 0
@@ -500,20 +500,21 @@ def main_loop():
                     if but ==2:
                         shapes = gfx__init()
                         state = 2
+                    
                     if but  ==3:
-                        pass
-                    if but  ==4:
                         shapes = particle_system_init()
-                        state = 4
+                        state = 3
                         
-                if but == 5: 
+                if but == 4: 
                     if viewsupports== True:
                         viewsupports == False
                     else: viewsupports = True
-                if but == 6:
-                    if state == 4:
+                if but == 5:
+                    
+                    if state == 3:
                         temp = shapemodule.particle([random.randint(1,7)*100,400],10,[random.randint(-1,1)*20,40],[random.randint(0,255),random.randint(0,255),random.randint(0,255)])
                         shapes.append(temp)
+                        
 
                     if state == 0:
                         temp = pygame.Rect(random.randint(0,s.size[0]),random.randint(0,s.size[1]),200,100)
@@ -575,7 +576,7 @@ def main_loop():
             
             s = gfx(s,shapes,amp)
            
-        elif state == 4:
+        elif state == 3 :
             ar = particles(s,shapes)
             s = ar[0]
 
